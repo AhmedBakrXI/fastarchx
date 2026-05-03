@@ -1,0 +1,10 @@
+[project]
+name = "fast-arch"
+version = "0.1.0"
+description = "Tool for generating fastapi project structure."
+authors = [{ name="Ahmed Bakr" }]
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.scripts]
+fast-arch = "fast-arch.cli:main"
