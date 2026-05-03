@@ -1,11 +1,10 @@
 from fast_arch.utils.fs import create_dir, create_file
 from fast_arch.core.config import ProjectConfig
-from fast_arch.schema.arch_schema import ArchitectureConfig
+from fast_arch.schema.arch_schema import Architecture, ArchitectureConfig
 from fast_arch.utils.json_reader import read_arch_config_json
 
 
-def generate_gitignore(project_name: str) -> bool:
-    gitignore_content = """__pycache__/
+GITIGNORE_CONTENT = """__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -19,71 +18,111 @@ venv.bak/
 .vscode/
 *.log
 """
-    return create_file(f"{project_name}/.gitignore", gitignore_content)
+
+DOCKERFILE_CONTENT = """FROM python:3.9-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+"""
 
 
-def generate_project(project_config: ProjectConfig) -> bool:
-    app_file_content = (
-        f"from fastapi import FastAPI\n\napp = FastAPI(title='{project_config.name}')"
-    )
+def generate_gitignore(project_name: str) -> bool:
+    return create_file(f"{project_name}/.gitignore", GITIGNORE_CONTENT)
 
-    # Create project directory
+
+def create_base_project(project_config: ProjectConfig) -> bool:
     if not create_dir(project_config.name):
         print("Failed to create project directory.")
         return False
-    # Create main app file
-    app_file_path = f"{project_config.name}/app.py"
-    if not create_file(app_file_path, app_file_content):
+
+    app_content = f"from fastapi import FastAPI\n\napp = FastAPI(title='{project_config.name}')"
+    if not create_file(f"{project_config.name}/app.py", app_content):
         print("Failed to create app.py file.")
         return False
 
-    arch_config: ArchitectureConfig = read_arch_config_json()
-    arch = next(
-        (a for a in arch_config.architectures if a.name == project_config.arch), None
-    )
+    return True
+
+
+def get_architecture(project_config: ProjectConfig) -> Architecture:
+    arch_config = read_arch_config_json()
+
+    for arch in arch_config.architectures:
+        if arch.name == project_config.arch:
+            return arch
+
+    raise ValueError(f"Architecture '{project_config.arch}' not found")
+
+def create_arch_structure(project_name: str, arch) -> bool:
+    for folder in arch.folders:
+        if not create_dir(f"{project_name}/{folder}"):
+            print(f"Failed to create folder: {folder}")
+            return False
+
+    for file in arch.files:
+        if not create_file(f"{project_name}/{file}"):
+            print(f"Failed to create file: {file}")
+            return False
+
+    return True
+
+
+def create_feature_files(project_config: ProjectConfig, arch) -> bool:
+    for feature in project_config.features:
+        feature_key = feature.lower()
+
+        if feature_key in arch.features:
+            for file in arch.features[feature_key].files:
+                if not create_file(f"{project_config.name}/{file}"):
+                    print(f"Failed to create feature file: {file}")
+                    return False
+
+    return True
+
+
+def handle_special_features(project_config: ProjectConfig) -> None:
+    project_name = project_config.name
+    features = {f.lower() for f in project_config.features}
+
+    if "docker" in features:
+        create_file(f"{project_name}/Dockerfile", DOCKERFILE_CONTENT)
+        create_file(f"{project_name}/docker-compose.yml")
+
+    if "environment variables" in features:
+        env_content = ""
+        if "database" in features:
+            env_content += "DATABASE_URL=\nUSERNAME=\nPASSWORD=\n"
+
+        create_file(f"{project_name}/.env", env_content)
+        create_file(f"{project_name}/.env.example", env_content)
+
+
+def finalize_project(project_name: str) -> None:
+    create_file(f"{project_name}/requirements.txt", "fastapi\nuvicorn\n")
+    generate_gitignore(project_name)
+
+
+def generate_project(project_config: ProjectConfig) -> bool:
+    if not create_base_project(project_config):
+        return False
+
+    arch = get_architecture(project_config)
     if not arch:
         print(f"Architecture {project_config.arch} not found in config.")
         return False
-    # Create folders based on selected architecture
-    for folder in arch.folders:
-        if not create_dir(f"{project_config.name}/{folder}"):
-            print(f"Failed to create folder: {folder}")
-            return False
+
+    if not create_arch_structure(project_config.name, arch):
+        return False
+
     print(
         f"Project '{project_config.name}' generated successfully with {project_config.arch} architecture."
     )
 
-    for file in arch.files:
-        file_path = f"{project_config.name}/{file}"
-        if not create_file(file_path):
-            print(f"Failed to create file: {file}")
-            return False
-    print("All files created successfully.")
+    if not create_feature_files(project_config, arch):
+        return False
 
-    for feature in project_config.features:
-        if feature.lower() in arch.features:
-            feature_info = arch.features[feature.lower()]
-            for file in feature_info.files:
-                file_path = f"{project_config.name}/{file}"
-                if not create_file(file_path):
-                    print(f"Failed to create feature file: {file}")
-                    return False
+    handle_special_features(project_config)
+    finalize_project(project_config.name)
 
-    for feature in project_config.features:
-        if feature.lower() == "docker":
-            docker_content = 'FROM python:3.9-slim\nWORKDIR /app\nCOPY . .\nRUN pip install -r requirements.txt\nCMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]'
-            create_file(f"{project_config.name}/Dockerfile", docker_content)
-            create_file(f"{project_config.name}/docker-compose.yml")
-
-        if feature.lower() == "environment variables":
-            env_content: str = ""
-            env_content += "DATABASE_URL=\n"
-            env_content += "USERNAME=\n"
-            env_content += "PASSWORD=\n"
-            create_file(f"{project_config.name}/.env", env_content)
-            create_file(f"{project_config.name}/.env.example", env_content)
-
-    create_file(f"{project_config.name}/requirements.txt", "fastapi\nuvicorn\n")
-    generate_gitignore(project_config.name)
-    print("All feature files created successfully.")
+    print("Project setup completed successfully.")
     return True
