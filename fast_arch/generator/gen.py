@@ -93,12 +93,20 @@ def handle_special_features(project_config: ProjectConfig) -> None:
         if "database" in features:
             env_content += "DATABASE_URL=\nUSERNAME=\nPASSWORD=\n"
 
+        if "authentication" in features:
+            env_content += "SECRET_KEY=\nALGORITHM=\nACCESS_TOKEN_EXPIRE_MINUTES=\n"
+
         create_file(f"{project_name}/.env", env_content)
         create_file(f"{project_name}/.env.example", env_content)
 
 
-def finalize_project(project_name: str) -> None:
-    create_file(f"{project_name}/requirements.txt", "fastapi\nuvicorn\n")
+def finalize_project(project_name: str, hasDB: bool = False, hasAuth: bool = False) -> None:
+    requirements = "fastapi\nuvicorn\npydantic\n"
+    if hasDB:
+        requirements += "sqlalchemy\npsycopg2-binary\n"
+    if hasAuth:
+        requirements += "passlib\npython-jose\n"
+    create_file(f"{project_name}/requirements.txt", requirements)
     generate_gitignore(project_name)
 
 
@@ -122,7 +130,9 @@ def generate_project(project_config: ProjectConfig) -> bool:
         return False
 
     handle_special_features(project_config)
-    finalize_project(project_config.name)
+    hasDB = "database" in {f.lower() for f in project_config.features}
+    hasAuth = "authentication" in {f.lower() for f in project_config.features}  
+    finalize_project(project_config.name, hasDB, hasAuth)
 
     print("Project setup completed successfully.")
     return True
