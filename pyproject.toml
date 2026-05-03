@@ -5,7 +5,7 @@ description = "Tool for generating fastapi project structure."
 authors = [{ name="Ahmed Bakr" }]
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["questionary", "jinja2"]
+dependencies = ["questionary", "pydantic"]
 
 [project.scripts]
 fast-arch = "fast_arch.cli:main"
