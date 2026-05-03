@@ -1,4 +1,6 @@
-from fast_arch.utils.fs import create_dir, create_file
+from pathlib import Path
+
+from fast_arch.utils.fs import create_dir, create_file, read_file
 from fast_arch.core.config import ProjectConfig
 from fast_arch.schema.arch_schema import Architecture, ArchitectureConfig
 from fast_arch.utils.json_reader import read_arch_config_json
@@ -99,8 +101,13 @@ def handle_special_features(project_config: ProjectConfig) -> None:
         create_file(f"{project_name}/.env", env_content)
         create_file(f"{project_name}/.env.example", env_content)
 
+def read_arch_md(arch: str) -> str:
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    arch_md_file = BASE_DIR / "architectures" / f"{arch}.md"
+    print(f"Reading architecture details from: {arch_md_file}")
+    return read_file(arch_md_file.__str__())
 
-def finalize_project(project_name: str, hasDB: bool = False, hasAuth: bool = False) -> None:
+def finalize_project(project_name: str, arch: str, hasDB: bool = False, hasAuth: bool = False) -> None:
     requirements = "fastapi\nuvicorn\npydantic\n"
     if hasDB:
         requirements += "sqlalchemy\npsycopg2-binary\n"
@@ -108,6 +115,27 @@ def finalize_project(project_name: str, hasDB: bool = False, hasAuth: bool = Fal
         requirements += "passlib\npython-jose\n"
     create_file(f"{project_name}/requirements.txt", requirements)
     generate_gitignore(project_name)
+    
+    # add ARCHITECTURE.md file with architecture details
+    arch_md_content = read_arch_md(arch)
+    create_file(f"{project_name}/ARCHITECTURE.md", arch_md_content)
+
+def print_next_steps(project_config: ProjectConfig) -> None:
+    # Next steps: Initialize git, create virtual environment, install dependencies, etc.
+    print("============================================================")
+    print(f"✓ Project '{project_config.name}' created successfully!")
+    print("============================================================")
+    print("\nArchitecture:", project_config.arch)
+    print("Features:", ", ".join(project_config.features))
+    print("\nNext steps:")
+    print(f"1. cd {project_config.name}")
+    print("2. git init")
+    print("3. python -m venv env")
+    print("4. source env/bin/activate (Linux/Mac) or env\\Scripts\\activate (Windows)")
+    print("5. pip install -r requirements.txt") 
+    print("6. uvicorn app:app --reload or fastapi run app:app --reload")
+    print("\nAPI Documentation: http://localhost:8000/docs")
+    print("============================================================")
 
 
 def generate_project(project_config: ProjectConfig) -> bool:
@@ -132,7 +160,10 @@ def generate_project(project_config: ProjectConfig) -> bool:
     handle_special_features(project_config)
     hasDB = "database" in {f.lower() for f in project_config.features}
     hasAuth = "authentication" in {f.lower() for f in project_config.features}  
-    finalize_project(project_config.name, hasDB, hasAuth)
+    finalize_project(project_config.name, project_config.arch, hasDB, hasAuth)
 
     print("Project setup completed successfully.")
+
+    print_next_steps(project_config)
+ 
     return True

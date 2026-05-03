@@ -29,3 +29,12 @@ def delete_dir(path: str) -> bool:
         print(f"Error deleting directory {path}: {e}")
         return False
     
+def read_file(path: str) -> str:
+    """Reads the content of a file."""
+    try:
+        with open(path, 'r') as f:
+            return f.read()
+    except Exception as e:
+        print(f"Error reading file {path}: {e}")
+        return ""
+    

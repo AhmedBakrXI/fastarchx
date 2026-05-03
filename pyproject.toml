@@ -11,4 +11,4 @@ dependencies = ["questionary", "pydantic"]
 fast-arch = "fast_arch.cli:main"
 
 [tool.setuptools.package-data]
-fast_arch = ["architectures/*.json"]
+fast_arch = ["architectures/*.json", "architectures/*.md"]
