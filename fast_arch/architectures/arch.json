@@ -1,0 +1,225 @@
+{
+    "architectures": [
+        {
+            "name": "Layered",
+            "description": "A layered architecture with clear separation of concerns.",
+            "folders": [
+                "presentation",
+                "application",
+                "domain",
+                "infrastructure"
+            ],
+            "files": [
+                "README.md",
+                "requirements.txt",
+                "/__init__.py",
+                "/presentation/__init__.py",
+                "/application/__init__.py",
+                "/domain/__init__.py",
+                "/infrastructure/__init__.py"
+            ],
+            "features": {
+                "authentication": {
+                    "description": "User authentication and authorization",
+                    "files": [
+                        "/domain/auth.py",
+                        "/application/auth_service.py",
+                        "/presentation/auth_controller.py"
+                    ]
+                },
+                "database": {
+                    "description": "Database integration and management",
+                    "files": [
+                        "/infrastructure/database.py",
+                        "/domain/models.py"
+                    ]
+                },
+                "api": {
+                    "description": "RESTful API endpoints",
+                    "files": [
+                        "/presentation/api.py"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Clean",
+            "description": "A clean architecture with a focus on maintainability and testability.",
+            "folders": [
+                "app/use_cases",
+                "app/entities",
+                "app/interfaces",
+                "infrastructure/db",
+                "infrastructure/api",
+                "infrastructure/auth",
+                "tests"
+            ],
+            "files": [
+                "README.md",
+                "requirements.txt",
+                "/app/__init__.py",
+                "/app/use_cases/__init__.py",
+                "/app/entities/__init__.py",
+                "/app/interfaces/__init__.py",
+                "/infrastructure/db/__init__.py",
+                "/infrastructure/api/__init__.py",
+                "/infrastructure/auth/__init__.py",
+                "/tests/__init__.py"
+            ],
+            "features": {
+                "authentication": {
+                    "description": "User authentication and authorization",
+                    "files": [
+                        "/infrastructure/auth/auth_service.py",
+                        "/app/interfaces/auth_interface.py",
+                        "/app/entities/user.py"
+                    ]
+                },
+                "database": {
+                    "description": "Database integration and management",
+                    "files": [
+                        "/infrastructure/db/database.py",
+                        "/app/entities/models.py"
+                    ]
+                },
+                "api": {
+                    "description": "RESTful API endpoints",
+                    "files": [
+                        "/infrastructure/api/api.py",
+                        "/app/use_cases/api_use_cases.py"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Hexagonal",
+            "description": "Ports and Adapters architecture focusing on domain isolation.",
+            "folders": [
+                "core/domain",
+                "core/ports",
+                "adapters/api",
+                "adapters/db",
+                "config",
+                "tests"
+            ],
+            "files": [
+                "README.md",
+                "requirements.txt",
+                "/core/domain/__init__.py",
+                "/core/ports/__init__.py",
+                "/adapters/api/__init__.py",
+                "/adapters/db/__init__.py",
+                "/config/__init__.py",
+                "/tests/__init__.py"
+            ],
+            "features": {
+                "authentication": {
+                    "description": "Authentication using ports and adapters",
+                    "files": [
+                        "/core/domain/user.py",
+                        "/core/ports/auth_port.py",
+                        "/adapters/api/auth_controller.py",
+                        "/adapters/db/auth_repository.py"
+                    ]
+                },
+                "database": {
+                    "description": "Database adapter implementation",
+                    "files": [
+                        "/adapters/db/database.py",
+                        "/core/ports/repository_port.py"
+                    ]
+                },
+                "api": {
+                    "description": "API adapter",
+                    "files": [
+                        "/adapters/api/api.py"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Modular Monolith",
+            "description": "Single application divided into independent modules.",
+            "folders": [
+                "modules/auth",
+                "modules/users",
+                "modules/core",
+                "shared",
+                "tests"
+            ],
+            "files": [
+                "README.md",
+                "requirements.txt",
+                "/modules/auth/__init__.py",
+                "/modules/users/__init__.py",
+                "/modules/core/__init__.py",
+                "/shared/__init__.py",
+                "/tests/__init__.py"
+            ],
+            "features": {
+                "authentication": {
+                    "description": "Auth module",
+                    "files": [
+                        "/modules/auth/service.py",
+                        "/modules/auth/controller.py",
+                        "/modules/auth/models.py"
+                    ]
+                },
+                "database": {
+                    "description": "Shared DB layer",
+                    "files": [
+                        "/shared/database.py"
+                    ]
+                },
+                "api": {
+                    "description": "Main API entry",
+                    "files": [
+                        "/modules/core/api.py"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "MVC",
+            "description": "Model-View-Controller pattern, simple and beginner-friendly.",
+            "folders": [
+                "models",
+                "views",
+                "controllers",
+                "routes",
+                "tests"
+            ],
+            "files": [
+                "README.md",
+                "requirements.txt",
+                "/models/__init__.py",
+                "/views/__init__.py",
+                "/controllers/__init__.py",
+                "/routes/__init__.py",
+                "/tests/__init__.py"
+            ],
+            "features": {
+                "authentication": {
+                    "description": "Auth MVC structure",
+                    "files": [
+                        "/models/user.py",
+                        "/controllers/auth_controller.py",
+                        "/views/auth_view.py"
+                    ]
+                },
+                "database": {
+                    "description": "Database models",
+                    "files": [
+                        "/models/database.py"
+                    ]
+                },
+                "api": {
+                    "description": "Routes definition",
+                    "files": [
+                        "/routes/api.py"
+                    ]
+                }
+            }
+        }
+    ]
+}

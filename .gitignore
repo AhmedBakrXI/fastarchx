@@ -1,1 +1,4 @@
 .venv/
+build/
+
+fast_arch.egg-info/
