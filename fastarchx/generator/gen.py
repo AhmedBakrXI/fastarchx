@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from fast_arch.utils.fs import create_dir, create_file, read_file
-from fast_arch.core.config import ProjectConfig
-from fast_arch.schema.arch_schema import Architecture, ArchitectureConfig
-from fast_arch.utils.json_reader import read_arch_config_json
+from fastarchx.utils.fs import create_dir, create_file, read_file
+from fastarchx.core.config import ProjectConfig
+from fastarchx.schema.arch_schema import Architecture, ArchitectureConfig
+from fastarchx.utils.json_reader import read_arch_config_json
 
 
 GITIGNORE_CONTENT = """__pycache__/
@@ -104,7 +104,6 @@ def handle_special_features(project_config: ProjectConfig) -> None:
 def read_arch_md(arch: str) -> str:
     BASE_DIR = Path(__file__).resolve().parent.parent
     arch_md_file = BASE_DIR / "architectures" / f"{arch}.md"
-    print(f"Reading architecture details from: {arch_md_file}")
     return read_file(arch_md_file.__str__())
 
 def finalize_project(project_name: str, arch: str, hasDB: bool = False, hasAuth: bool = False) -> None:

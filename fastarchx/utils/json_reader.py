@@ -1,6 +1,6 @@
 import json
 
-from fast_arch.schema.arch_schema import ArchitectureConfig
+from fastarchx.schema.arch_schema import ArchitectureConfig
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -1,5 +1,5 @@
 import questionary
-from fast_arch.core.config import ProjectConfig
+from fastarchx.core.config import ProjectConfig
 
 def prompt_project_config() -> ProjectConfig:
     name = questionary.text("Project name:").ask()

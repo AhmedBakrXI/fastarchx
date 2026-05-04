@@ -1,8 +1,8 @@
-from fast_arch.prompts.prompts import prompt_project_config
+from fastarchx.prompts.prompts import prompt_project_config
 
-from fast_arch.generator.gen import generate_project
+from fastarchx.generator.gen import generate_project
 
-from fast_arch.utils.fs import delete_dir
+from fastarchx.utils.fs import delete_dir
 
 def main():
     project_config = prompt_project_config()
